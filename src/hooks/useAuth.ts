@@ -2,10 +2,27 @@
 
 import { useState, useEffect } from 'react';
 
-interface User {
-  email: string;
+export interface User {
+  id?: string;
   name: string;
+  email: string;
   phone: string;
+  birthDate: string;
+  address: string;
+  city: string;
+  country: string;
+  postalCode: string;
+  telegram: string;
+  whatsapp: string;
+  preferredContact: string;
+  language: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  isLoading: boolean;
 }
 
 const isBrowser = typeof window !== 'undefined';

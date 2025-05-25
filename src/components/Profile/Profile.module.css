@@ -219,43 +219,93 @@
 }
 
 .formGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
-.inputGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.formSection {
+  background: var(--background-primary);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.label {
-  font-size: 0.95rem;
+.formSectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  color: var(--text-primary);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fieldsGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+
+.fieldContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--text-secondary);
-  font-weight: 500;
+  padding-left: 0.5rem;
+}
+
+.fieldBox {
+  background: var(--background-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.fieldBox:hover {
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .input {
-  padding: 1rem;
-  border: 2px solid var(--border-color);
-  border-radius: 12px;
-  background: var(--background-primary);
+  width: 100%;
+  background: transparent;
+  border: none;
   color: var(--text-primary);
-  transition: all 0.2s;
   font-size: 1rem;
+  padding: 0.25rem;
 }
 
 .input:disabled {
-  background: var(--background-disabled);
   cursor: not-allowed;
   opacity: 0.7;
 }
 
 .input:focus {
   outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.fieldBox:focus-within {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+  box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.2);
+}
+
+select.input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  padding-right: 2.5rem;
 }
 
 .saveButton {
@@ -452,12 +502,12 @@
     top: 1rem;
   }
 
-  .formGrid {
+  .fieldsGroup {
     grid-template-columns: 1fr;
   }
 
-  .section {
-    padding: 1.5rem;
+  .formSection {
+    padding: 1.25rem;
   }
 
   .avatar {
@@ -473,4 +523,38 @@
   .sectionTitle {
     font-size: 1.25rem;
   }
+}
+
+.formActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.saveMessage {
+  text-align: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.saveMessage.success {
+  background: rgba(34, 197, 94, 0.1);
+  color: rgb(34, 197, 94);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.saveMessage.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: rgb(239, 68, 68);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.saveButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 } 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -39,15 +39,41 @@ const mockOrders: OrderType[] = [
   }
 ];
 
+interface User {
+  name: string;
+  email: string;
+  phone: string;
+  birthDate: string;
+  address: string;
+  city: string;
+  country: string;
+  postalCode: string;
+  telegram: string;
+  whatsapp: string;
+  preferredContact: string;
+  language: string;
+}
+
 export const Profile = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<Section>('personal');
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState({
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+  const [userData, setUserData] = useState<User>({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    birthDate: '',
+    address: '',
+    city: '',
+    country: '',
+    postalCode: '',
+    telegram: '',
+    whatsapp: '',
+    preferredContact: '',
+    language: ''
   });
 
   useEffect(() => {
@@ -55,7 +81,16 @@ export const Profile = () => {
       setUserData({
         name: user.name || '',
         email: user.email || '',
-        phone: user.phone || ''
+        phone: user.phone || '',
+        birthDate: user.birthDate || '',
+        address: user.address || '',
+        city: user.city || '',
+        country: user.country || '',
+        postalCode: user.postalCode || '',
+        telegram: user.telegram || '',
+        whatsapp: user.whatsapp || '',
+        preferredContact: user.preferredContact || '',
+        language: user.language || ''
       });
     }
   }, [user]);
@@ -65,7 +100,7 @@ export const Profile = () => {
     router.push('/login');
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setUserData(prev => ({
       ...prev,
@@ -73,10 +108,22 @@ export const Profile = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // В реальном приложении здесь был бы API запрос для обновления данных
-    setIsEditing(false);
+    setIsSaving(true);
+    setSaveMessage('');
+
+    try {
+      // В реальном приложении здесь был бы API запрос
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSaveMessage('Изменения успешно сохранены');
+      setIsEditing(false);
+    } catch (error) {
+      setSaveMessage('Ошибка при сохранении изменений');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getStatusText = (status: OrderType['status']) => {
@@ -113,27 +160,30 @@ export const Profile = () => {
     );
   }
 
+  const renderPersonalSection = () => (
+    <section className={styles.section}>
+      <div className={styles.sectionHeader}>
+        <h3 className={styles.sectionTitle}>Личные данные</h3>
+        <button
+          onClick={() => {
+            setIsEditing(!isEditing);
+            setSaveMessage('');
+          }}
+          className={styles.editButton}
+          disabled={isSaving}
+        >
+          {isEditing ? 'Отменить' : 'Редактировать'}
+        </button>
+      </div>
 
-  
-  const renderContent = () => {
-    switch (activeSection) {
-      case 'personal':
-        return (
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h3 className={styles.sectionTitle}>Личные данные</h3>
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className={styles.editButton}
-              >
-                {isEditing ? 'Отменить' : 'Редактировать'}
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className={styles.form}>
-              <div className={styles.formGrid}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Имя</label>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.formGrid}>
+          <div className={styles.formSection}>
+            <h4 className={styles.formSectionTitle}>Основная информация</h4>
+            <div className={styles.fieldsGroup}>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Имя</label>
+                <div className={styles.fieldBox}>
                   <input
                     type="text"
                     name="name"
@@ -144,8 +194,10 @@ export const Profile = () => {
                     placeholder="Введите ваше имя"
                   />
                 </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Email</label>
+              </div>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Email</label>
+                <div className={styles.fieldBox}>
                   <input
                     type="email"
                     name="email"
@@ -156,8 +208,29 @@ export const Profile = () => {
                     placeholder="Введите ваш email"
                   />
                 </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>Телефон</label>
+              </div>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Дата рождения</label>
+                <div className={styles.fieldBox}>
+                  <input
+                    type="date"
+                    name="birthDate"
+                    value={userData.birthDate}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.formSection}>
+            <h4 className={styles.formSectionTitle}>Контактная информация</h4>
+            <div className={styles.fieldsGroup}>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Телефон</label>
+                <div className={styles.fieldBox}>
                   <input
                     type="tel"
                     name="phone"
@@ -169,15 +242,166 @@ export const Profile = () => {
                   />
                 </div>
               </div>
-              {isEditing && (
-                <button type="submit" className={styles.saveButton}>
-                  Сохранить изменения
-                </button>
-              )}
-            </form>
-          </section>
-        );
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Telegram</label>
+                <div className={styles.fieldBox}>
+                  <input
+                    type="text"
+                    name="telegram"
+                    value={userData.telegram}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                    placeholder="@username"
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>WhatsApp</label>
+                <div className={styles.fieldBox}>
+                  <input
+                    type="text"
+                    name="whatsapp"
+                    value={userData.whatsapp}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                    placeholder="+7 (___) ___-__-__"
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Предпочитаемый способ связи</label>
+                <div className={styles.fieldBox}>
+                  <select
+                    name="preferredContact"
+                    value={userData.preferredContact}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                  >
+                    <option value="">Выберите способ связи</option>
+                    <option value="phone">Телефон</option>
+                    <option value="telegram">Telegram</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="email">Email</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
 
+          <div className={styles.formSection}>
+            <h4 className={styles.formSectionTitle}>Адрес</h4>
+            <div className={styles.fieldsGroup}>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Улица, дом, квартира</label>
+                <div className={styles.fieldBox}>
+                  <input
+                    type="text"
+                    name="address"
+                    value={userData.address}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                    placeholder="Введите ваш адрес"
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Город</label>
+                <div className={styles.fieldBox}>
+                  <input
+                    type="text"
+                    name="city"
+                    value={userData.city}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                    placeholder="Введите город"
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Страна</label>
+                <div className={styles.fieldBox}>
+                  <input
+                    type="text"
+                    name="country"
+                    value={userData.country}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                    placeholder="Введите страну"
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Почтовый индекс</label>
+                <div className={styles.fieldBox}>
+                  <input
+                    type="text"
+                    name="postalCode"
+                    value={userData.postalCode}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                    placeholder="Введите почтовый индекс"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.formSection}>
+            <h4 className={styles.formSectionTitle}>Дополнительно</h4>
+            <div className={styles.fieldsGroup}>
+              <div className={styles.fieldContainer}>
+                <label className={styles.fieldLabel}>Предпочитаемый язык</label>
+                <div className={styles.fieldBox}>
+                  <select
+                    name="language"
+                    value={userData.language}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={styles.input}
+                  >
+                    <option value="">Выберите язык</option>
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {isEditing && (
+          <div className={styles.formActions}>
+            <button 
+              type="submit" 
+              className={styles.saveButton}
+              disabled={isSaving}
+            >
+              {isSaving ? 'Сохранение...' : 'Сохранить изменения'}
+            </button>
+            {saveMessage && (
+              <p className={`${styles.saveMessage} ${
+                saveMessage.includes('Ошибка') ? styles.error : styles.success
+              }`}>
+                {saveMessage}
+              </p>
+            )}
+          </div>
+        )}
+      </form>
+    </section>
+  );
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'personal':
+        return renderPersonalSection();
       case 'orders':
         return (
           <section className={styles.section}>
@@ -215,7 +439,6 @@ export const Profile = () => {
             </div>
           </section>
         );
-
       case 'addresses':
         return (
           <section className={styles.section}>
@@ -225,7 +448,6 @@ export const Profile = () => {
             </p>
           </section>
         );
-
       default:
         return null;
     }
